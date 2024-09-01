@@ -1,0 +1,247 @@
+
+-- Hack 1 al hack 4 de SQL que se hizo en Postgrest -->
+
+CREATE TABLE users(
+	id_user SERIAL PRIMARY KEY,
+	id_country INT NOT NULL,
+	email VARCHAR(100),
+	name VARCHAR(100),
+	FOREIGN KEY(id_country) REFERENCES countries(id_country)
+);
+
+CREATE TABLE countries (
+	id_country SERIAL PRIMARY KEY,
+	name VARCHAR(100) NOT NULL
+);
+
+INSERT INTO countries (name) VALUES ('argentina'), ('colombia'), ('chile');
+SELECT * FROM countries
+
+INSERT INTO users (id_country, email, name) VALUES (2, 'foo@foo.com', 'fooziman'), (3, 'bar@bar.com', 'barziman');
+
+
+SELECT * FROM users
+
+
+DELETE FROM users WHERE email = 'bar@bar.com';
+UPDATE users SET email = 'foo@foo.foo', name = 'fooz' WHERE id_user = 1;
+SELECT * FROM users
+
+SELECT * FROM users INNER JOIN 
+countries ON users.id_country = countries.id_country;
+
+SELECT u.id_user AS ID, u.email, u.name AS fullname, c.name 
+  FROM users u INNER JOIN  countries C ON u.id_country = c.id_country;
+
+
+
+CREATE TABLE priorities (
+	id_priority SERIAL PRIMARY KEY,
+	type_name VARCHAR(100)
+);
+
+CREATE TABLE contact_request (
+	id_email SERIAL PRIMARY KEY,
+	id_country INT NOT NULL,
+	id_priority INT NOT NULL,
+	name VARCHAR(100),
+	detail VARCHAR(100),
+	physical_address VARCHAR (100),
+	FOREIGN KEY(id_country) REFERENCES countries(id_country),
+	FOREIGN KEY(id_priority) REFERENCES priorities(id_priority)
+);
+
+SELECT * FROM countries
+
+INSERT INTO countries (name) VALUES ('Venezuela'), ('Estados Unidos'), ('CUBA'), ('Puerto Rico'), ('CANADA');
+
+INSERT INTO priorities (type_name) VALUES ('conocer'), ('comer'), ('disfrutar');
+
+SELECT * FROM priorities
+
+INSERT INTO contact_request (id_country, id_priority, name, detail, physical_address) VALUES (1, 1, 'Juan', 'Clase C', 'Barrio 23 de Enero'), (2, 2, 'Roberto', 'Clase b', 'Urbanizacion la floresta'), (3, 3, 'Diana', 'Clase A', 'Villa las Mercedes');
+SELECT * FROM contact_request
+
+select * from contact_request inner join  countries ON contact_request.id_country = countries.id_country;
+
+select * from contact_request inner join  priorities ON contact_request.id_priority = priorities.id_priority;
+
+DELETE FROM contact_request WHERE id_email = 3;
+
+UPDATE contact_request SET detail = 'Clase b' , physical_address = 'Urbanizacion las virginias' where id_email = 1;
+
+
+
+
+
+
+--Hack 5
+
+
+
+
+
+CREATE TABLE discounts(
+id_discount SERIAL PRIMARY KEY,
+status VARCHAR(100),
+percentage VARCHAR(10)
+);
+
+CREATE TABLE offers(
+id_offer SERIAL PRIMARY KEY,
+status VARCHAR(100)
+);
+
+CREATE TABLE taxes(
+id_tax SERIAL PRIMARY KEY,
+percentage VARCHAR(10)
+);
+
+CREATE TABLE roles(
+id_role SERIAL PRIMARY KEY,
+name VARCHAR(100)
+)
+
+CREATE TABLE countries(
+id_country SERIAL PRIMARY KEY,
+name VARCHAR(100)
+)
+
+CREATE TABLE invoice_status(
+id_invoice_status SERIAL PRIMARY KEY,
+status VARCHAR(20)
+)
+
+CREATE TABLE products(
+id_product SERIAL PRIMARY KEY,
+id_discount INT,
+id_offer INT,
+id_tax INT,
+name VARCHAR(50),
+details VARCHAR(100),
+minimum_stock INT,
+maximum_stock INT,
+current_stock INT,
+price DECIMAL(8, 2),
+price_with_tax DECIMAL (8,2),
+foreign key (id_discount) references discounts (id_discount),
+foreign key (id_offer) references offers (id_offer),
+foreign key (id_tax) references taxes (id_tax)
+)
+
+
+CREATE TABLE products_customers(
+id_product INT,
+id_customer INT,
+foreign key (id_product) references products (id_product)
+)
+
+CREATE TABLE customers(
+email VARCHAR(100) PRIMARY KEY,
+id_country INT,
+id_role INT,
+name VARCHAR(50),
+age INT,
+password VARCHAR(50),
+physical_address VARCHAR(100),
+foreign key (id_country) references countries (id_country),
+foreign key (id_role) references roles (id_role)
+)
+
+
+CREATE TABLE payments(
+id_payment SERIAL PRIMARY KEY,
+type VARCHAR(50)
+)
+
+CREATE TABLE invoices(
+id_invoice SERIAL PRIMARY KEY,
+id_customer INT,
+id_payment INT,
+id_invoice_status INT,
+date DATE,
+total_to_pay DECIMAL(8, 2),
+foreign key (id_payment) references payments (id_payment),
+foreign key (id_invoice_status) references invoice_status (id_invoice_status)
+)
+
+
+CREATE TABLE orders(
+id_order SERIAL PRIMARY KEY,
+id_invoice INT,
+id_product INT,
+detail VARCHAR(100),
+amount INT,
+price DECIMAL(8, 2),
+foreign key (id_invoice) references invoices (id_invoice),
+foreign key (id_product) references products (id_product)
+)
+
+
+
+-- Hack 6
+
+
+
+
+SELECT * FROM countries
+INSERT INTO countries (name) VALUES ('Venezuela'),('Argentina'),('Canada');
+
+SELECT * FROM roles
+
+INSERT INTO roles (name) VALUES ('Admin'),('User'),('User2');
+
+SELECT * FROM taxes
+
+INSERT INTO taxes (percentage) VALUES ('10%'),('16%'),('20%');
+
+SELECT * FROM offers
+
+INSERT INTO offers (status) VALUES ('Activo'),('Inactivo'),('Final');
+
+SELECT * FROM discounts
+
+INSERT INTO discounts (status, percentage) VALUES ('Activo', '16%'),('Inactivo', '10%'),('Final', '20%');
+
+SELECT * FROM payments
+
+INSERT INTO payments (type) VALUES ('Efectivo'),('Zelle'),('Credito');
+
+SELECT * FROM customers
+
+INSERT INTO customers (email,id_country,id_role,name,age,password,physical_address) VALUES ('JoseDuran1@gmail.com',1,1,'Jose',28,'1234','calle 67 urb Canta claro'),('CarlosRomero2@gmail.com',2,2,'Carlos',44,'4321','Barrio Nuevo, edif 3 PB'),('DanielaPerez3@gmail.com',3,3,'Daniela',32,'1324','Sector panamericano calle 4 casa 79');
+
+SELECT * FROM invoice_status 
+
+INSERT INTO invoice_status (status) VALUES ('Cancelada'),('Pendiente por pago'),('En proceso');
+
+SELECT * FROM products
+
+INSERT INTO products (id_discount,id_offer,id_tax,name,details,minimum_stock,maximum_stock,current_stock,price,price_with_tax) VALUES (1,1,1,'Coca-cola','bebida refrescante',10,40,20,10,11),(2,2,2,'Galleta Oreo','Golosina,postres,meriendas',5,10,15,5,7),(3,3,3,'Harina Pan','Harina de maiz pre-cocida',20,60,30,13,16);
+
+SELECT * FROM products_customers
+
+INSERT INTO products_customers (id_product,id_customer) VALUES (1,1),(2,3),(3,2);
+
+SELECT * FROM invoices
+
+INSERT INTO invoices (id_customer, id_payment,id_invoice_status,date,total_to_pay) VALUES (2,2,2,'2024-10-01', 104.53), (3,3,3,'2024-10-15', 30.40), (1,1,1,'2024-10-05',200.10);
+
+SELECT * FROM orders
+
+INSERT INTO orders (id_invoice,id_product,detail,amount,price) VALUES (1,1,'Coca-cola',5,11),(2,2,'Galleta Oreo',1,7),(3,3,'Harina Pan Pre-cocida',1,16);
+
+DELETE FROM orders WHERE id_invoice = (1);
+
+UPDATE customers SET name = 'Roberto',age = 55, email = 'RobertoCarlos123@gmail.com' WHERE email = 'DanielaPerez3@gmail.com';
+
+UPDATE taxes SET percentage = '12%' WHERE id_tax = 1;
+UPDATE taxes SET percentage = '18%' WHERE id_tax = 2;
+UPDATE taxes SET percentage = '22%' WHERE id_tax = 3;
+
+
+UPDATE products SET price = 15 WHERE id_product = 1;
+UPDATE products SET price = 7 WHERE id_product = 2;
+UPDATE products SET price = 11 WHERE id_product = 3;
+
+SELECT * FROM products
